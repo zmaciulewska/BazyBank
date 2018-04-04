@@ -1,5 +1,6 @@
 package models;
 
+//Data Transfer Model for client table
 public class Client {
 
     private Integer id;

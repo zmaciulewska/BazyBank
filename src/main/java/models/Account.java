@@ -1,5 +1,5 @@
 package models;
-
+//Data Transfer Model for Accounttable
 public class Account {
 
     private Integer id;
