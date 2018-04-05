@@ -1,13 +1,16 @@
 package models;
-//Data Transfer Model for Accounttable
+//Data Transfer Model for Account table\
+
+
 public class Account {
 
-    private Integer id;
-    private Integer idClient;
+    private Integer idClient,id;
+    private float balance;
     private String notes;
-    private long balance;
 
-    public Account(Integer id, Integer idClient, String notes, long balance) {
+
+    public Account() {}
+    public Account(Integer id, Integer idClient, String notes, float balance) {
         this.id = id;
         this.idClient = idClient;
         this.notes = notes;
@@ -30,11 +33,11 @@ public class Account {
         this.idClient = idClient;
     }
 
-    public long getBalance() {
+    public float getBalance() {
         return balance;
     }
 
-    public void setBalance(long balance) {
+    public void setBalance(float balance) {
         this.balance = balance;
     }
 

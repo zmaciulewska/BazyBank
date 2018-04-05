@@ -6,10 +6,10 @@ import models.Client;
 import java.util.List;
 
 public interface AccountDao {
-    void save(Account account);
+    void save(Account account) throws RuntimeException;
     void delete(Account account);
     void update(Account account);
-    Client findById(int id);
-    Client findByName(String name);
-    List<Client> findAll();
+    Account findById(int id);
+    Account findByName(String name);
+    List<Account> findAll();
 }
