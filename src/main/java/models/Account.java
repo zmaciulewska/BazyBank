@@ -10,8 +10,8 @@ public class Account {
 
 
     public Account() {}
-    public Account(Integer id, Integer idClient, String notes, float balance) {
-        this.id = id;
+    public Account( Integer idClient, String notes, float balance) {
+        this.id = 1;
         this.idClient = idClient;
         this.notes = notes;
         this.balance = balance;
@@ -56,6 +56,6 @@ public class Account {
                 ", idClient=" + idClient +
                 ", notes='" + notes + '\'' +
                 ", balance=" + balance +
-                '}';
+                "}\n";
     }
 }

@@ -3,7 +3,11 @@ package DataAccessObject;
 import com.pabwoopj.DatabaseConnector;
 import models.Account;
 
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,30 +20,19 @@ public class jdbcAccountDao implements AccountDao {
             final String sql = "INSERT INTO account VALUES (DEFAULT, ?, ?, ?)";
             try {
                 PreparedStatement statement = connection.prepareStatement(sql);
-                DatabaseMetaData md=connection.getMetaData();
 
-                /*ResultSet result = statement.getGeneratedKeys();
-                result.next();
-                Integer id=result.getInt(1);*/
 
-                //System.out.println("statement ok.");
-               // statement.setInt(1, );
                 statement.setString(1, account.getNotes());
                 statement.setFloat(2, account.getBalance());
                 statement.setInt(3, account.getIdClient());
 
                 statement.executeUpdate();
-                //System.out.println("tu nie ok.");
                 statement.close();
                 connection.close();
             } catch (SQLException e) {
-                //System.out.println("wyjebało");
                 e.printStackTrace();
-                throw new RuntimeException(e);
             }
         }
-
-
     }
 
     public void delete(Account account) {
@@ -83,12 +76,36 @@ public class jdbcAccountDao implements AccountDao {
     }
 
     public Account findById(int id) {
+        Connection connection = DatabaseConnector.getConnection();
+        if(connection != null){
+
+            final String sql = "SELECT * FROM ACCOUNT WHERE id=?";
+            try {
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setInt(1, id);
+                ResultSet rs = statement.executeQuery();
+                Account acc = new Account();
+                while(rs.next()) {
+
+                    acc.setId(rs.getInt("id"));
+                    acc.setNotes(rs.getString("notes"));
+                    acc.setBalance(rs.getFloat("balance"));
+                    acc.setIdClient(rs.getInt("id_client"));
+
+                }
+
+                statement.close();
+                connection.close();
+                if(acc.getId() !=null) return acc;
+                else return null;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
-    public Account findByName(String name) {
-        return null;
-    }
+
 
     public List<Account> findAll() {
         Connection connection = DatabaseConnector.getConnection();

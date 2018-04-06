@@ -10,6 +10,5 @@ public interface AccountDao {
     void delete(Account account);
     void update(Account account);
     Account findById(int id);
-    Account findByName(String name);
     List<Account> findAll();
 }

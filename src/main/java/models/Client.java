@@ -7,8 +7,8 @@ public class Client {
     private String firstName, lastName, pesel, email;
 
     public Client() {}
-    public Client(Integer id, String firstName, String lastName, String pesel, String email) {
-        this.id = id;
+    public Client( String firstName, String lastName, String pesel, String email) {
+        this.id = 1;
         this.firstName = firstName;
         this.lastName = lastName;
         this.pesel = pesel;
@@ -65,6 +65,6 @@ public class Client {
                 ", lastName='" + lastName + '\'' +
                 ", pesel='" + pesel + '\'' +
                 ", email='" + email + '\'' +
-                '}';
+                "}\n";
     }
 }
