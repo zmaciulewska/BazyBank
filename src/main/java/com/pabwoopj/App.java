@@ -114,10 +114,10 @@ public class App extends Application {
         accept2.setText("Accept");
         GridPane.setConstraints(accept2, 0, 2);
         accept2.setOnAction(e -> {
-            Client c=cliDao.findById(cliDao.findById(Integer.parseInt(tfid1.getText())));
+            Client c=cliDao.findById(Integer.parseInt(tfid1.getText()));
             tfid1.clear();
             if( c != null) {
-                cliDao.delete();
+                cliDao.delete(c);
                 window.setScene(sceneMenu);
                 InformationWindow.display("Information", "Deleting client succeeded " );
             }
