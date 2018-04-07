@@ -12,69 +12,59 @@ import java.util.List;
 
 public class jdbcClientDao implements ClientDao {
 
-    public void save(Client client) {
+    public void save(Client client) throws SQLException {
 
         Connection connection = DatabaseConnector.getConnection();
         if(connection != null){
             final String sql = "INSERT INTO CLIENT VALUES (DEFAULT, ?, ?, ?, ?)";
-            try {
-                PreparedStatement statement = connection.prepareStatement(sql);
-                statement.setString(1, client.getFirstName());
-                statement.setString(2, client.getLastName());
-                statement.setString(3, client.getPesel());
-                statement.setString(4, client.getEmail());
 
-                statement.executeUpdate();
-                statement.close();
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, client.getFirstName());
+            statement.setString(2, client.getLastName());
+            statement.setString(3, client.getPesel());
+            statement.setString(4, client.getEmail());
+
+            statement.executeUpdate();
+            statement.close();
+            connection.close();
         }
     }
 
-    public void delete(Client client) {
+    public void delete(Client client) throws SQLException {
 
         Connection connection = DatabaseConnector.getConnection();
         if(connection != null){
             final String sql = "DELETE FROM CLIENT WHERE id=?";
-            try {
                 PreparedStatement statement=connection.prepareStatement(sql);
                 statement.setInt(1, client.getId());
                 statement.executeUpdate();
 
                 statement.close();
                 connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
     }
 
-    public void update(Client client) {
+    public void update(Client client) throws SQLException {
 
         Connection connection = DatabaseConnector.getConnection();
         if(connection != null){
             final String sql = "UPDATE CLIENT SET FIRSTNAME=?, LASTNAME=?, PESEL=?, EMAIL=? WHERE ID=?";
-            try {
-                PreparedStatement statement=connection.prepareStatement(sql);
-                statement.setInt(5, client.getId());
-                statement.setString(1, client.getFirstName());
-                statement.setString(2, client.getLastName());
-                statement.setString(3, client.getPesel());
-                statement.setString(4, client.getEmail());
-                statement.executeUpdate();
 
-                statement.close();
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            PreparedStatement statement=connection.prepareStatement(sql);
+            statement.setInt(5, client.getId());
+            statement.setString(1, client.getFirstName());
+            statement.setString(2, client.getLastName());
+            statement.setString(3, client.getPesel());
+            statement.setString(4, client.getEmail());
+            statement.executeUpdate();
+
+            statement.close();
+            connection.close();
         }
     }
 
-    public Client findById(int id) {
+    public Client findById(int id)  {
 
         Connection connection = DatabaseConnector.getConnection();
         if(connection != null){
@@ -84,7 +74,7 @@ public class jdbcClientDao implements ClientDao {
                 statement.setInt(1, id);
                 ResultSet rs = statement.executeQuery();
                 Client client = new Client();
-                while(rs.next()) {
+                while (rs.next()) {
                     client.setId(rs.getInt("id"));
                     client.setFirstName(rs.getString("firstname"));
                     client.setLastName(rs.getString("lastname"));
@@ -94,11 +84,12 @@ public class jdbcClientDao implements ClientDao {
 
                 statement.close();
                 connection.close();
-                if(client.getId() != null) return client;
+                if (client.getId() != null) return client;
                 else return null;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+
         }
         return null;
     }
@@ -113,10 +104,11 @@ public class jdbcClientDao implements ClientDao {
                 PreparedStatement statement = connection.prepareStatement(sql);
                 statement.setString(1, name);
                 ResultSet rs = statement.executeQuery();
-                Client client = new Client();
-                List<Client> list=new ArrayList<Client>();
+                List<Client> list = new ArrayList<Client>();
                 while(rs.next()) {
+                    Client client = new Client();
                     client.setId(rs.getInt("id"));
+                    if( client.getId() == null) return null;
                     client.setFirstName(rs.getString("firstname"));
                     client.setLastName(rs.getString("lastname"));
                     client.setPesel(rs.getString("pesel"));
@@ -143,16 +135,17 @@ public class jdbcClientDao implements ClientDao {
             try {
                 PreparedStatement statement = connection.prepareStatement(sql);
                 ResultSet rs = statement.executeQuery();
+
                 while(rs.next()) {
                     Client client = new Client();
                     client.setId(rs.getInt("id"));
+                    if( client.getId() == null) return null;
                     client.setFirstName(rs.getString("firstname"));
                     client.setLastName(rs.getString("lastname"));
                     client.setPesel(rs.getString("pesel"));
                     client.setEmail(rs.getString("email"));
                     list.add(client);
                 }
-
                 statement.close();
                 connection.close();
                 return list;

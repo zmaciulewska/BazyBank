@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import models.Account;
 import models.Client;
 
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,13 +82,19 @@ public class App extends Application {
         accept1.setText("Accept");
         GridPane.setConstraints(accept1, 0, 5);
         accept1.setOnAction(e -> {
-            cliDao.save(new Client(tfname.getText(), tflname.getText(), tfpesel.getText(), tfmail.getText()));
-            tfname.clear();
-            tflname.clear();
-            tfpesel.clear();
-            tfmail.clear();
-            window.setScene(sceneMenu);
-            InformationWindow.display("Information", "Creating new client succeeded " );
+            try {
+                cliDao.save(new Client(tfname.getText(), tflname.getText(), tfpesel.getText(), tfmail.getText()));
+                InformationWindow.display("Information", "Creating new client succeeded " );
+            } catch (SQLException sqle) {
+                InformationWindow.display("Information",  sqle.getMessage());
+            }
+            finally {
+                tfname.clear();
+                tflname.clear();
+                tfpesel.clear();
+                tfmail.clear();
+                window.setScene(sceneMenu);
+            }
         });
 
         laySaveCli.getChildren().addAll(l1, tfname, tflname, tfpesel, tfmail, accept1);
@@ -103,29 +110,37 @@ public class App extends Application {
         layDelCli.setVgap(20);
         layDelCli.setHgap(15);
 
-        Label l2 = new Label("Which account you want to delete?");
+        Label l2 = new Label("Which client you want to delete?");
         GridPane.setConstraints(l1, 0, 0);
 
         TextField tfid1 = new TextField();
-        tfid1.setPromptText("Id");
+        tfid1.setPromptText("Client ID");
         GridPane.setConstraints(tfid1, 0, 1);
 
         Button accept2= new Button();
         accept2.setText("Accept");
         GridPane.setConstraints(accept2, 0, 2);
         accept2.setOnAction(e -> {
-            Client c=cliDao.findById(Integer.parseInt(tfid1.getText()));
-            tfid1.clear();
-            if( c != null) {
-                cliDao.delete(c);
-                window.setScene(sceneMenu);
-                InformationWindow.display("Information", "Deleting client succeeded " );
+            try {
+                Client c=cliDao.findById(Integer.parseInt(tfid1.getText()));
+                if( c != null) {
+                    try{
+                        cliDao.delete(c);
+                        InformationWindow.display("Information", "Deleting client succeeded " );
+                    } catch (SQLException sqle) {
+                        InformationWindow.display("Information", sqle.getMessage());
+                    }
+                }
+                else {
+                    InformationWindow.display("Information", "Client not exist. " );
+                }
+            } catch (NumberFormatException nfe){
+                InformationWindow.display("Information", "Wrong data format." );
             }
-            else {
+            finally{
+                tfid1.clear();
                 window.setScene(sceneMenu);
-                InformationWindow.display("Information", "Client doesn't exist. " );
             }
-
         });
 
         layDelCli.getChildren().addAll(l2, tfid1, accept2);
@@ -149,7 +164,7 @@ public class App extends Application {
         GridPane.setConstraints(tfname3, 0, 1);
 
         TextField tflname3 = new TextField();
-        tflname3.setPromptText("Lastname");
+        tflname3.setPromptText("Last name");
         GridPane.setConstraints(tflname3, 0, 2);
 
         TextField tfpesel3 = new TextField();
@@ -157,36 +172,46 @@ public class App extends Application {
         GridPane.setConstraints(tfpesel3, 0, 3);
 
         TextField tfmail3 = new TextField();
-        tfmail3.setPromptText("email");
+        tfmail3.setPromptText("Email");
         GridPane.setConstraints(tfmail3, 0, 4);
 
         TextField tfid3 = new TextField();
-        tfid3.setPromptText("Account ID");
+        tfid3.setPromptText("Client ID");
         GridPane.setConstraints(tfid3, 0, 5);
 
-        Button accept3= new Button();
+        Button accept3 = new Button();
         accept3.setText("Accept");
         GridPane.setConstraints(accept3, 0, 6);
         accept3.setOnAction(e -> {
 
-            Client c=cliDao.findById(Integer.parseInt(tfid3.getText()));
-            c.setFirstName(tfname3.getText());
-            c.setLastName(tflname3.getText());
-            c.setPesel(tfpesel3.getText());
-            c.setEmail(tfmail3.getText());
-            cliDao.update(c);
-            tfname3.clear();
-            tflname3.clear();
-            tfpesel3.clear();
-            tfmail3.clear();
-            tfid3.clear();
-            window.setScene(sceneMenu);
-            InformationWindow.display("Information", "Updating client succeeded " );
+
+            try {
+                Client c=cliDao.findById(Integer.parseInt(tfid3.getText()));
+                c.setFirstName(tfname3.getText());
+                c.setLastName(tflname3.getText());
+                c.setPesel(tfpesel3.getText());
+                c.setEmail(tfmail3.getText());
+                cliDao.update(c);
+                InformationWindow.display("Information", "Updating client succeeded." );
+            }
+            catch (SQLException sqle) {
+                InformationWindow.display("Information", sqle.getMessage() );
+            }
+            catch (NumberFormatException nfe) {
+                InformationWindow.display("Information", "Wrong data format" );
+            }
+            finally {
+                tfname3.clear();
+                tflname3.clear();
+                tfpesel3.clear();
+                tfmail3.clear();
+                tfid3.clear();
+                window.setScene(sceneMenu);
+            }
         });
 
         layUpCli.getChildren().addAll(l3, tfname3, tflname3, tfpesel3, tfmail3, tfid3,  accept3);
         scUpCli = new Scene(layUpCli, 400, 400);
-
 
 
         //find by id
@@ -210,11 +235,18 @@ public class App extends Application {
         accept4.setText("Accept");
         GridPane.setConstraints(accept4, 0, 2);
         accept4.setOnAction(e -> {
-            Client c = cliDao.findById(Integer.parseInt(tfid4.getText()));
-            tfid4.clear();
-            window.setScene(sceneMenu);
-            if( c != null ) InformationWindow.display("Information", "Account found: \n"+c.toString() );
-            else InformationWindow.display("Information", "Account not found. ");
+            try {
+                Client c = cliDao.findById(Integer.parseInt(tfid4.getText()));
+                if( c != null ) InformationWindow.display("Information", "Account found: \n"+c.toString() );
+                else InformationWindow.display("Information", "Account not found. ");
+            }
+            catch (NumberFormatException nfe) {
+                InformationWindow.display("Information", "Wrong data format");
+            }
+            finally {
+                tfid4.clear();
+                window.setScene(sceneMenu);
+            }
         });
 
         layFindIdCli.getChildren().addAll(l4, tfid4, accept4);
@@ -243,9 +275,9 @@ public class App extends Application {
         accept5.setOnAction(e -> {
             List<Client> list=cliDao.findByName(tfsname5.getText());
             tfsname5.clear();
+            if(list.isEmpty()) InformationWindow.display("Information", "Account not found. ");
+            else InformationWindow.display("Information", Collections.singletonList(list));
             window.setScene(sceneMenu);
-            if( list != null ) InformationWindow.display("Information", Collections.singletonList(list));
-            else InformationWindow.display("Information", "Account not found. ");
         });
 
         layFindNameCli.getChildren().addAll(l5, tfsname5, accept5);
@@ -295,28 +327,25 @@ public class App extends Application {
         accept6.setText("Accept");
         GridPane.setConstraints(accept6, 0, 4);
         accept6.setOnAction(e -> {
-            if(cliDao.findById(Integer.parseInt(tfidclient.getText())) != null){
+            try {
                 accDao.save(new Account(Integer.parseInt(tfidclient.getText()), tfnotes.getText(), Float.parseFloat(tfbalance.getText())));
+                InformationWindow.display("Information", "Creating new account succeeded " );
+            } catch( SQLException sqle) {
+                InformationWindow.display("Information", sqle.getMessage());
+            } catch ( NumberFormatException nfe) {
+                InformationWindow.display("Information", "Wrong data format");
+            }
+            finally {
                 tfnotes.clear();
                 tfbalance.clear();
                 tfidclient.clear();
                 window.setScene(sceneMenu);
-                InformationWindow.display("Information", "Creating new account succeeded " );
             }
-            else {
-                InformationWindow.display("Information", "Client (id:  " +
-                        Integer.parseInt(tfidclient.getText()) + " ) doesn't exist.");
-                window.setScene(sceneMenu);
-            }
-
         });
 
 
         laySaveAcc.getChildren().addAll(l6, tfnotes, tfbalance, tfidclient, accept6);
         scSaveAcc = new Scene(laySaveAcc, 400, 400);
-
-
-
 
         //delete
         Button buttonDelAcc = new Button();
@@ -339,19 +368,22 @@ public class App extends Application {
         accept7.setText("Accept");
         GridPane.setConstraints(accept7, 0, 2);
         accept7.setOnAction(e -> {
-            Account a = accDao.findById(Integer.parseInt(tfid7.getText()));
-            tfid7.clear();
-            if( a!= null){
-                accDao.delete(a);
-
-                window.setScene(sceneMenu);
-                InformationWindow.display("Information", "Deleting new account succeeded " );
+            try{
+                Account a = accDao.findById(Integer.parseInt(tfid7.getText()));
+                if( a != null) {
+                    accDao.delete(a);
+                    InformationWindow.display("Information", "Deleting new account succeeded " );
+                }
+                else {
+                    InformationWindow.display("Information", "Client doesn't exist.");
+                }
+            } catch (NumberFormatException nfe) {
+                InformationWindow.display("Information", "Wrong data format");
             }
-            else {
-                InformationWindow.display("Information", "Client doesn't exist.");
+            finally {
+                tfid7.clear();
                 window.setScene(sceneMenu);
             }
-
         });
 
         layDelAcc.getChildren().addAll(l7, tfid7, accept7);
@@ -386,38 +418,36 @@ public class App extends Application {
         tfid8.setPromptText("Account ID");
         GridPane.setConstraints(tfid8 , 0, 4);
 
-        Button accept8= new Button();
+        Button accept8 = new Button();
         accept8.setText("Accept");
         GridPane.setConstraints(accept8, 0, 5);
         accept8.setOnAction(e -> {
-            Account a = accDao.findById(Integer.parseInt(tfid8.getText()));
-            if( a!= null) {
-                a.setNotes(tfnotes8.getText());
-                a.setBalance(Float.parseFloat(tfbalance8.getText()));
-                a.setIdClient(Integer.parseInt(tfidclient8.getText()));
-                Client c = cliDao.findById(Integer.parseInt(tfidclient8.getText()));
-                if(c !=null) {
-                    accDao.update(a);
-                    window.setScene(sceneMenu);
-                    InformationWindow.display("Information", "Updating account succeeded " );
-                }
-                else {
-                    InformationWindow.display("Information", "Client doesn't exist.");
-                    window.setScene(sceneMenu);
-                }
-            }
-            else {
-                InformationWindow.display("Information", "Account (id:  " +
-                        Integer.parseInt(tfid8.getText()) + " ) doesn't exist.");
-                window.setScene(sceneMenu);
-            }
-            tfid8.clear();
-            tfnotes8.clear();
-            tfbalance8.clear();
-            tfidclient8.clear();
+                try {
+                    Account a = accDao.findById(Integer.parseInt(tfid8.getText()));
+                    if( a!= null) {
+                        a.setNotes(tfnotes8.getText());
+                        a.setBalance(Float.parseFloat(tfbalance8.getText()));
+                        a.setIdClient(Integer.parseInt(tfidclient8.getText()));
+                        accDao.update(a);
+                        InformationWindow.display("Information", "Updating account succeeded ");
+                    }
+                    else {
+                        InformationWindow.display("Information", "Account doesn't exist.");
+                    }
 
+                }catch (SQLException sqle) {
+                    InformationWindow.display("Information", sqle.getMessage());
+                }catch (NumberFormatException nfe) {
+                    InformationWindow.display("Information", "Wrong data format");
+                }
+                finally {
+                    tfid8.clear();
+                    tfnotes8.clear();
+                    tfbalance8.clear();
+                    tfidclient8.clear();
+                    window.setScene(sceneMenu);
+                }
         });
-
 
         layUpAcc.getChildren().addAll(l8, tfnotes8, tfbalance8, tfidclient8, tfid8, accept8);
         scUpAcc = new Scene(layUpAcc, 400, 400);
@@ -443,11 +473,17 @@ public class App extends Application {
         accept9.setText("Accept");
         GridPane.setConstraints(accept9, 0, 2);
         accept9.setOnAction(e -> {
-            Account a = accDao.findById(Integer.parseInt(tfid9.getText()));
-            tfid9.clear();
-            window.setScene(sceneMenu);
-            if( a != null ) InformationWindow.display("Information", "Account found: \n" +  a.toString());
-            else InformationWindow.display("Information", "Account not found. ");
+            try {
+                Account a = accDao.findById(Integer.parseInt(tfid9.getText()));
+                if( a != null ) InformationWindow.display("Information", "Account found: \n" +  a.toString());
+                else InformationWindow.display("Information", "Account not found. ");
+            } catch (NumberFormatException nfe) {
+                InformationWindow.display("Information", "Wrong data format");
+            }
+            finally {
+                tfid9.clear();
+                window.setScene(sceneMenu);
+            }
         });
 
         layFindIdAcc.getChildren().addAll(l9, tfid9, accept9);

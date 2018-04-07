@@ -13,14 +13,12 @@ import java.util.List;
 
 public class jdbcAccountDao implements AccountDao {
 
-    public void save(Account account) throws RuntimeException {
+    public void save(Account account) throws SQLException {
 
         Connection connection = DatabaseConnector.getConnection();
         if(connection != null){
             final String sql = "INSERT INTO account VALUES (DEFAULT, ?, ?, ?)";
-            try {
                 PreparedStatement statement = connection.prepareStatement(sql);
-
 
                 statement.setString(1, account.getNotes());
                 statement.setFloat(2, account.getBalance());
@@ -29,9 +27,6 @@ public class jdbcAccountDao implements AccountDao {
                 statement.executeUpdate();
                 statement.close();
                 connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -53,12 +48,12 @@ public class jdbcAccountDao implements AccountDao {
         }
     }
 
-    public void update(Account account) {
+    public void update(Account account) throws SQLException {
 
         Connection connection = DatabaseConnector.getConnection();
         if(connection != null){
             final String sql = "UPDATE ACCOUNT SET NOTES=?, BALANCE=?, ID_CLIENT=? WHERE ID=?";
-            try {
+
                 PreparedStatement statement=connection.prepareStatement(sql);
                 statement.setInt(4, account.getId());
                 statement.setString(1, account.getNotes());
@@ -68,9 +63,6 @@ public class jdbcAccountDao implements AccountDao {
 
                 statement.close();
                 connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
 
     }
@@ -96,7 +88,7 @@ public class jdbcAccountDao implements AccountDao {
 
                 statement.close();
                 connection.close();
-                if(acc.getId() !=null) return acc;
+                if(acc.getId() != null) return acc;
                 else return null;
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -118,12 +110,12 @@ public class jdbcAccountDao implements AccountDao {
                 while(rs.next()) {
                     Account acc = new Account();
                     acc.setId(rs.getInt("id"));
+                    if( acc.getId() == null) return null;
                     acc.setNotes(rs.getString("notes"));
                     acc.setBalance(rs.getFloat("balance"));
                     acc.setIdClient(rs.getInt("id_client"));
                     list.add(acc);
                 }
-
                 statement.close();
                 connection.close();
                 return list;
