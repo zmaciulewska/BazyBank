@@ -9,7 +9,7 @@ public class DatabaseConnector {
     private static final String jdbcDriver="oracle.jdbc.driver.OracleDriver";
     private static final String jdbcUrl="jdbc:oracle:thin:@localhost:1521:xe";
     private static final String jdbcUser="HR";
-    private static final String jdbcPass="dupa1";
+    private static final String jdbcPass="";
 
     public DatabaseConnector() {}
     public static Connection getConnection() {
